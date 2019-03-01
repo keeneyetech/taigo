@@ -23,7 +23,7 @@ type Client struct {
 	UserStoryStatus *UserStoryStatusService
 }
 
-func NewClient(authToken, URL string) *Client {
+func NewClient(URL, authToken string) *Client {
 	c := &Client{
 		authToken: authToken,
 		client:    http.DefaultClient,

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	client = NewClient(os.Getenv("TAIGA_TOKEN"), os.Getenv("TAIGA_URL"))
+	client = NewClient(os.Getenv("TAIGA_URL"), os.Getenv("TAIGA_TOKEN"))
 )
 
 func assertNoError(t *testing.T, err error, resp *http.Response) {

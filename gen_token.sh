@@ -2,6 +2,7 @@
 # Request username and password for connecting to Taiga
 read -p "Username or email: " USERNAME
 read -r -s -p "Password: " PASSWORD
+read -p "Taiga domain: " TAIGA_DOMAIN
 
 DATA=$(jq --null-input \
         --arg username "$USERNAME" \
@@ -12,7 +13,7 @@ DATA=$(jq --null-input \
 USER_AUTH_DETAIL=$( curl -X POST \
   -H "Content-Type: application/json" \
   -d "$DATA" \
-  https://projects.keeneyetechnologies.com/api/v1/auth 2>/dev/null )
+  https://$TAIGA_DOMAIN/api/v1/auth 2>/dev/null )
 
 echo $USER_AUTH_DETAIL
 
