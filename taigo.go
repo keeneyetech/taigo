@@ -10,7 +10,6 @@ import (
 	"reflect"
 
 	"github.com/google/go-querystring/query"
-	"github.com/pkg/errors"
 )
 
 type Client struct {
@@ -79,10 +78,10 @@ func (c *Client) NewRequest(method, urlStr string, opt interface{}, body interfa
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	if c := resp.StatusCode; c < 200 || c > 299 {
-		return resp, errors.Errorf("Server returns status %d", c)
+		return resp, fmt.Errorf("Server returns status %d", c)
 	}
 
 	if v != nil {
@@ -96,7 +95,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 			err = json.NewDecoder(resp.Body).Decode(v)
 		}
 	}
-	return resp, errors.WithStack(err)
+	return resp, err
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s.  opt
@@ -104,7 +103,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 func addOptions(s string, opt interface{}) (*url.URL, error) {
 	u, err := url.Parse(s)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 	if opt == nil {
 		return u, nil
@@ -118,7 +117,7 @@ func addOptions(s string, opt interface{}) (*url.URL, error) {
 
 	qs, err := query.Values(opt)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	u.RawQuery = qs.Encode()
