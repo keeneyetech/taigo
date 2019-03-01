@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 )
@@ -26,6 +27,9 @@ func NewClient(URL, authToken string) *Client {
 	c := &Client{
 		authToken: authToken,
 		client:    http.DefaultClient,
+	}
+	if !strings.HasPrefix(URL, "/") {
+		URL += "/"
 	}
 
 	var err error
@@ -59,7 +63,6 @@ func (c *Client) NewRequest(method, urlStr string, opt interface{}, body interfa
 			return nil, err
 		}
 	}
-	fmt.Println("URL", u.String())
 
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
@@ -86,9 +89,6 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 	if v != nil {
 		defer resp.Body.Close()
-		//var b bytes.Buffer
-		//io.Copy(&b, resp.Body)
-		//fmt.Println(b.String())
 		if w, ok := v.(io.Writer); ok {
 			_, err = io.Copy(w, resp.Body)
 		} else {

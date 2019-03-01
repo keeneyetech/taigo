@@ -15,7 +15,7 @@ Like many other Go API clients, this library follows the same pattern as
 // Create a client
 client := taigo.NewClient("YOUR-TAIGA-API-URL", "YOUR-AUTH-TOKEN")
 
-// Get a project for his slug name
+// Get a project for its slug name
 project, _, err := client.Project.GetBySlug("user-project")
 
 // List userstories of the project
