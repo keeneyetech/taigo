@@ -1,6 +1,7 @@
 package taigo
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -10,6 +11,7 @@ type ProjectService struct {
 }
 
 type ProjectListEntry struct {
+	ID                   int           `json:"id"`
 	AnonPermissions      []interface{} `json:"anon_permissions"`
 	BlockedCode          interface{}   `json:"blocked_code"`
 	CreatedDate          time.Time     `json:"created_date"`
@@ -26,7 +28,6 @@ type ProjectListEntry struct {
 	IAmAdmin             bool          `json:"i_am_admin"`
 	IAmMember            bool          `json:"i_am_member"`
 	IAmOwner             bool          `json:"i_am_owner"`
-	ID                   int           `json:"id"`
 	IsBacklogActivated   bool          `json:"is_backlog_activated"`
 	IsContactActivated   bool          `json:"is_contact_activated"`
 	IsEpicsActivated     bool          `json:"is_epics_activated"`
@@ -286,4 +287,28 @@ func (s *ProjectService) List() ([]ProjectListEntry, *http.Response, error) {
 	var v []ProjectListEntry
 	resp, err := s.client.Do(req, &v)
 	return v, resp, err
+}
+
+func (s *ProjectService) Get(id int) (*Project, *http.Response, error) {
+	u := fmt.Sprintf("projects/%d", id)
+	req, err := s.client.NewRequest("GET", u, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var v Project
+	resp, err := s.client.Do(req, &v)
+	return &v, resp, err
+}
+
+func (s *ProjectService) GetBySlug(slug string) (*Project, *http.Response, error) {
+	u := fmt.Sprintf("projects/by_slug?slug=%s", slug)
+	req, err := s.client.NewRequest("GET", u, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var v Project
+	resp, err := s.client.Do(req, &v)
+	return &v, resp, err
 }

@@ -18,7 +18,9 @@ type Client struct {
 	URL       *url.URL
 	client    *http.Client
 
-	Project *ProjectService
+	Project         *ProjectService
+	UserStory       *UserStoryService
+	UserStoryStatus *UserStoryStatusService
 }
 
 func NewClient(authToken, URL string) *Client {
@@ -34,6 +36,8 @@ func NewClient(authToken, URL string) *Client {
 	}
 
 	c.Project = &ProjectService{c}
+	c.UserStory = &UserStoryService{c}
+	c.UserStoryStatus = &UserStoryStatusService{c}
 	return c
 }
 
