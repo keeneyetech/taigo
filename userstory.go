@@ -181,13 +181,34 @@ type UserStory struct {
 	Watchers        []interface{} `json:"watchers"`
 }
 
+type UserStoryRequest struct {
+	Version           int         `json:"version"`
+	Status            *int        `json:"status,omitempty"`
+	Project           *int        `json:"project,omitempty"`
+	Subject           *string     `json:"subject,omitempty"`
+	Description       *string     `json:"description,omitempty"`
+	AssignedTo        *int        `json:"assigned_to,omitempty"`
+	BacklogOrder      *int        `json:"backlog_order,omitempty"`
+	BlockedNote       *string     `json:"blocked_note,omitempty"`
+	ClientRequirement *bool       `json:"client_requirement,omitempty"`
+	IsBlocked         *bool       `json:"is_blocked,omitempty"`
+	IsClosed          *bool       `json:"is_closed,omitempty"`
+	KanbanOrder       *int        `json:"kanban_order,omitempty"`
+	Milestone         *int        `json:"milestone,omitempty"`
+	Points            interface{} `json:"points,omitempty"`
+	SprintOrder       *int        `json:"sprint_order,omitempty"`
+	Tags              *[]string   `json:"tags,omitempty"`
+	TeamRequirement   *bool       `json:"team_requirement,omitempty"`
+	Watchers          *[]int      `json:"watchers,omitempty"`
+}
+
 type UserStoryListOptions struct {
-	ProjectID        *int  `url:"project,omitempty"`
-	MilestoneID      *int  `url:"milestone,omitempty"`
+	Project          *int  `url:"project,omitempty"`
+	Milestone        *int  `url:"milestone,omitempty"`
 	MilestoneIsNull  *bool `url:"milestone__isnull,omitempty"`
-	StatusId         *int  `url:"status,omitempty"`
+	Status           *int  `url:"status,omitempty"`
 	StatusIsArchived *bool `url:"status__is_archived,omitempty"`
-	Warchers         *int  `url:"watchers,omitempty"`
+	Watchers         *int  `url:"watchers,omitempty"`
 	AssignedTo       *int  `url:"assigned_to,omitempty"`
 	StatusIsClosed   *bool `url:"status__is_closed,omitempty"`
 }
@@ -215,9 +236,31 @@ func (s *UserStoryService) Get(ID int) (*UserStory, *http.Response, error) {
 	return &v, resp, err
 }
 
-func (s *UserStoryService) GetByRef(ref, projectID int) (*UserStory, *http.Response, error) {
-	u := fmt.Sprintf("userstories/by_ref?ref=%d&project=%d", ref, projectID)
-	req, err := s.client.NewRequest("GET", u, nil, nil)
+func (s *UserStoryService) GetByRef(project interface{}, ref int) (*UserStory, *http.Response, error) {
+	req, err := s.client.NewRequest("GET", "userstories/by_ref", getByRefOptions(project, ref), nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var v UserStory
+	resp, err := s.client.Do(req, &v)
+	return &v, resp, err
+}
+
+func (s *UserStoryService) Create(body *UserStoryRequest) (*UserStory, *http.Response, error) {
+	req, err := s.client.NewRequest("POST", "userstories", nil, body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var v UserStory
+	resp, err := s.client.Do(req, &v)
+	return &v, resp, err
+}
+
+func (s *UserStoryService) Edit(ID int, body *UserStoryRequest) (*UserStory, *http.Response, error) {
+	u := fmt.Sprintf("userstories/%d", ID)
+	req, err := s.client.NewRequest("PATCH", u, nil, body)
 	if err != nil {
 		return nil, nil, err
 	}

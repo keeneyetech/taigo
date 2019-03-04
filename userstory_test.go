@@ -40,7 +40,12 @@ func TestUserStory(t *testing.T) {
 	assertNoError(t, err, resp)
 	fmt.Println(uss[0].Subject, us.Subject)
 
-	us, resp, err = client.UserStory.GetByRef(uss[0].Ref, uss[0].Project)
+	us, resp, err = client.UserStory.GetByRef(uss[0].Project, uss[0].Ref)
+
+	assertNoError(t, err, resp)
+	fmt.Println(uss[0].Subject, us.Subject)
+
+	us, resp, err = client.UserStory.GetByRef(uss[0].ProjectExtraInfo.Slug, uss[0].Ref)
 
 	assertNoError(t, err, resp)
 	fmt.Println(uss[0].Subject, us.Subject)

@@ -21,6 +21,8 @@ type Client struct {
 	Project         *ProjectService
 	UserStory       *UserStoryService
 	UserStoryStatus *UserStoryStatusService
+	Issue           *IssueService
+	IssueStatus     *IssueStatusService
 }
 
 func NewClient(URL, authToken string) *Client {
@@ -129,3 +131,18 @@ func String(v string) *string { return &v }
 func Bool(v bool) *bool { return &v }
 
 func Int(v int) *int { return &v }
+
+func getByRefOptions(project interface{}, ref int) interface{} {
+	opts := struct {
+		Ref         int     `url:"ref"`
+		ProjectID   *int    `url:"project,omitempty"`
+		ProjectSlug *string `url:"project__slug,omitempty"`
+	}{Ref: ref}
+	switch p := project.(type) {
+	case int:
+		opts.ProjectID = &p
+	case string:
+		opts.ProjectSlug = &p
+	}
+	return opts
+}
