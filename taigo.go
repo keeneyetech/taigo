@@ -28,7 +28,7 @@ func NewClient(URL, authToken string) *Client {
 		authToken: authToken,
 		client:    http.DefaultClient,
 	}
-	if !strings.HasPrefix(URL, "/") {
+	if !strings.HasSuffix(URL, "/") {
 		URL += "/"
 	}
 
