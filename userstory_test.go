@@ -26,7 +26,7 @@ func TestUserStory(t *testing.T) {
 	}
 
 	opts.StatusIsClosed = Bool(false)
-	opts.StatusId = Int(91)
+	opts.Status = Int(91)
 
 	uss, resp, err = client.UserStory.List(opts)
 

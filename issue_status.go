@@ -1,9 +1,5 @@
 package taigo
 
-import (
-	"net/http"
-)
-
 type IssueStatusService struct {
 	client *Client
 }
@@ -24,7 +20,7 @@ type IssueStatusListOptions struct {
 	ProjectID *int `url:"project,omitempty"`
 }
 
-func (s *IssueStatusService) List(opts *IssueStatusListOptions) ([]IssueStatus, *http.Response, error) {
+func (s *IssueStatusService) List(opts *IssueStatusListOptions) ([]IssueStatus, *Response, error) {
 	req, err := s.client.NewRequest("GET", "userstory-statuses", opts, nil)
 	if err != nil {
 		return nil, nil, err

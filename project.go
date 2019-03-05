@@ -2,7 +2,6 @@ package taigo
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 )
 
@@ -278,7 +277,7 @@ type Project struct {
 	VideoconferencesExtraData interface{} `json:"videoconferences_extra_data"`
 }
 
-func (s *ProjectService) List() ([]ProjectListEntry, *http.Response, error) {
+func (s *ProjectService) List() ([]ProjectListEntry, *Response, error) {
 	req, err := s.client.NewRequest("GET", "projects", nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -289,7 +288,7 @@ func (s *ProjectService) List() ([]ProjectListEntry, *http.Response, error) {
 	return v, resp, err
 }
 
-func (s *ProjectService) Get(id int) (*Project, *http.Response, error) {
+func (s *ProjectService) Get(id int) (*Project, *Response, error) {
 	u := fmt.Sprintf("projects/%d", id)
 	req, err := s.client.NewRequest("GET", u, nil, nil)
 	if err != nil {
@@ -301,7 +300,7 @@ func (s *ProjectService) Get(id int) (*Project, *http.Response, error) {
 	return &v, resp, err
 }
 
-func (s *ProjectService) GetBySlug(slug string) (*Project, *http.Response, error) {
+func (s *ProjectService) GetBySlug(slug string) (*Project, *Response, error) {
 	u := fmt.Sprintf("projects/by_slug?slug=%s", slug)
 	req, err := s.client.NewRequest("GET", u, nil, nil)
 	if err != nil {

@@ -2,7 +2,6 @@ package taigo
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 )
 
@@ -165,7 +164,7 @@ type IssueListOptions struct {
 	StatusIsClosed *bool `url:"status__is_closed,omitempty"`
 }
 
-func (s *IssueService) List(opts *IssueListOptions) ([]IssueListEntry, *http.Response, error) {
+func (s *IssueService) List(opts *IssueListOptions) ([]IssueListEntry, *Response, error) {
 	req, err := s.client.NewRequest("GET", "issues", opts, nil)
 	if err != nil {
 		return nil, nil, err
@@ -176,7 +175,7 @@ func (s *IssueService) List(opts *IssueListOptions) ([]IssueListEntry, *http.Res
 	return v, resp, err
 }
 
-func (s *IssueService) Get(ID int) (*Issue, *http.Response, error) {
+func (s *IssueService) Get(ID int) (*Issue, *Response, error) {
 	u := fmt.Sprintf("issues/%d", ID)
 	req, err := s.client.NewRequest("GET", u, nil, nil)
 	if err != nil {
@@ -188,7 +187,7 @@ func (s *IssueService) Get(ID int) (*Issue, *http.Response, error) {
 	return &v, resp, err
 }
 
-func (s *IssueService) GetByRef(project interface{}, ref int) (*Issue, *http.Response, error) {
+func (s *IssueService) GetByRef(project interface{}, ref int) (*Issue, *Response, error) {
 	req, err := s.client.NewRequest("GET", "issues/by_ref", getByRefOptions(project, ref), nil)
 	if err != nil {
 		return nil, nil, err
@@ -199,7 +198,7 @@ func (s *IssueService) GetByRef(project interface{}, ref int) (*Issue, *http.Res
 	return &v, resp, err
 }
 
-func (s *IssueService) Create(body *IssueRequest) (*Issue, *http.Response, error) {
+func (s *IssueService) Create(body *IssueRequest) (*Issue, *Response, error) {
 	req, err := s.client.NewRequest("POST", "issues", nil, body)
 	if err != nil {
 		return nil, nil, err
@@ -210,7 +209,7 @@ func (s *IssueService) Create(body *IssueRequest) (*Issue, *http.Response, error
 	return &v, resp, err
 }
 
-func (s *IssueService) Edit(ID int, body *IssueRequest) (*Issue, *http.Response, error) {
+func (s *IssueService) Edit(ID int, body *IssueRequest) (*Issue, *Response, error) {
 	u := fmt.Sprintf("issues/%d", ID)
 	req, err := s.client.NewRequest("PATCH", u, nil, body)
 	if err != nil {

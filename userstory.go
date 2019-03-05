@@ -2,7 +2,6 @@ package taigo
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 )
 
@@ -213,7 +212,7 @@ type UserStoryListOptions struct {
 	StatusIsClosed   *bool `url:"status__is_closed,omitempty"`
 }
 
-func (s *UserStoryService) List(opts *UserStoryListOptions) ([]UserStoryListEntry, *http.Response, error) {
+func (s *UserStoryService) List(opts *UserStoryListOptions) ([]UserStoryListEntry, *Response, error) {
 	req, err := s.client.NewRequest("GET", "userstories", opts, nil)
 	if err != nil {
 		return nil, nil, err
@@ -224,7 +223,7 @@ func (s *UserStoryService) List(opts *UserStoryListOptions) ([]UserStoryListEntr
 	return v, resp, err
 }
 
-func (s *UserStoryService) Get(ID int) (*UserStory, *http.Response, error) {
+func (s *UserStoryService) Get(ID int) (*UserStory, *Response, error) {
 	u := fmt.Sprintf("userstories/%d", ID)
 	req, err := s.client.NewRequest("GET", u, nil, nil)
 	if err != nil {
@@ -236,7 +235,7 @@ func (s *UserStoryService) Get(ID int) (*UserStory, *http.Response, error) {
 	return &v, resp, err
 }
 
-func (s *UserStoryService) GetByRef(project interface{}, ref int) (*UserStory, *http.Response, error) {
+func (s *UserStoryService) GetByRef(project interface{}, ref int) (*UserStory, *Response, error) {
 	req, err := s.client.NewRequest("GET", "userstories/by_ref", getByRefOptions(project, ref), nil)
 	if err != nil {
 		return nil, nil, err
@@ -247,7 +246,7 @@ func (s *UserStoryService) GetByRef(project interface{}, ref int) (*UserStory, *
 	return &v, resp, err
 }
 
-func (s *UserStoryService) Create(body *UserStoryRequest) (*UserStory, *http.Response, error) {
+func (s *UserStoryService) Create(body *UserStoryRequest) (*UserStory, *Response, error) {
 	req, err := s.client.NewRequest("POST", "userstories", nil, body)
 	if err != nil {
 		return nil, nil, err
@@ -258,7 +257,7 @@ func (s *UserStoryService) Create(body *UserStoryRequest) (*UserStory, *http.Res
 	return &v, resp, err
 }
 
-func (s *UserStoryService) Edit(ID int, body *UserStoryRequest) (*UserStory, *http.Response, error) {
+func (s *UserStoryService) Edit(ID int, body *UserStoryRequest) (*UserStory, *Response, error) {
 	u := fmt.Sprintf("userstories/%d", ID)
 	req, err := s.client.NewRequest("PATCH", u, nil, body)
 	if err != nil {

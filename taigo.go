@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -80,13 +81,13 @@ func (c *Client) NewRequest(method, urlStr string, opt interface{}, body interfa
 // and stored in the value pointed by v.
 // Do can be used to perform the request created with NewRequest, which
 // should be used only for API requests not implemented in this library.
-func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	if c := resp.StatusCode; c < 200 || c > 299 {
-		return resp, fmt.Errorf("Server returns status %d", c)
+		return newResponse(resp), fmt.Errorf("Server returns status %d", c)
 	}
 
 	if v != nil {
@@ -97,7 +98,51 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 			err = json.NewDecoder(resp.Body).Decode(v)
 		}
 	}
-	return resp, err
+	return newResponse(resp), err
+}
+
+type Response struct {
+	*http.Response
+
+	// Paginated indicates if pagination is being used for the request
+	Paginated bool
+	// PaginatedBy holds the number of results per page
+	PaginatedBy int
+	// PaginationCount holds total number of results
+	PaginationCount int
+	// PaginationCurrent holds the current page
+	PaginationCurrent int
+	// PaginationNext holds the next results
+	PaginationNext int
+	// PaginationPrev holds the previous results
+	PaginationPrev int
+}
+
+// newResponse creates a new Response for the provided http.Response.
+func newResponse(r *http.Response) *Response {
+	response := &Response{Response: r}
+	response.populatePageValues()
+	return response
+}
+
+const (
+	xPaginated         = "x-paginated"
+	xPaginatedBy       = "x-paginated-by"
+	xPaginationCount   = "x-pagintation-count"
+	xPaginationCurrent = "x-pagintation-current"
+	xPaginationNext    = "x-pagintation-next"
+	xPaginationPrev    = "x-pagintation-prev"
+)
+
+// populatePageValues parses the HTTP Link response headers and populates the
+// various pagination link values in the Response.
+func (r *Response) populatePageValues() {
+	r.Paginated = r.Header.Get(xPaginated) == "true"
+	r.PaginatedBy, _ = strconv.Atoi(r.Header.Get(xPaginatedBy))
+	r.PaginationCount, _ = strconv.Atoi(r.Header.Get(xPaginationCount))
+	r.PaginationCurrent, _ = strconv.Atoi(r.Header.Get(xPaginationCurrent))
+	r.PaginationNext, _ = strconv.Atoi(r.Header.Get(xPaginationNext))
+	r.PaginationPrev, _ = strconv.Atoi(r.Header.Get(xPaginationPrev))
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s.  opt

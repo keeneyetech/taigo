@@ -3,7 +3,6 @@ package taigo
 import (
 	"bytes"
 	"io"
-	"net/http"
 	"os"
 	"testing"
 )
@@ -12,7 +11,7 @@ var (
 	client = NewClient(os.Getenv("TAIGA_URL"), os.Getenv("TAIGA_TOKEN"))
 )
 
-func assertNoError(t *testing.T, err error, resp *http.Response) {
+func assertNoError(t *testing.T, err error, resp *Response) {
 	t.Helper()
 	if err != nil {
 		var b bytes.Buffer
