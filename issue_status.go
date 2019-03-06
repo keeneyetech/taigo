@@ -21,7 +21,7 @@ type IssueStatusListOptions struct {
 }
 
 func (s *IssueStatusService) List(opts *IssueStatusListOptions) ([]IssueStatus, *Response, error) {
-	req, err := s.client.NewRequest("GET", "userstory-statuses", opts, nil)
+	req, err := s.client.NewRequest("GET", "issue-statuses", opts, nil)
 	if err != nil {
 		return nil, nil, err
 	}
