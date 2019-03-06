@@ -44,6 +44,8 @@ func NewClient(URL, authToken string) *Client {
 	c.Project = &ProjectService{c}
 	c.UserStory = &UserStoryService{c}
 	c.UserStoryStatus = &UserStoryStatusService{c}
+	c.Issue = &IssueService{c}
+	c.IssueStatus = &IssueStatusService{c}
 	return c
 }
 
@@ -86,8 +88,11 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	if c := resp.StatusCode; c < 200 || c > 299 {
-		return newResponse(resp), fmt.Errorf("Server returns status %d", c)
+	response := newResponse(resp)
+
+	err = checkResponse(resp)
+	if err != nil {
+		return response, err
 	}
 
 	if v != nil {
@@ -98,7 +103,34 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 			err = json.NewDecoder(resp.Body).Decode(v)
 		}
 	}
-	return newResponse(resp), err
+	return response, err
+}
+
+type ResponseError struct {
+	Status  int
+	Message string `json:"_error_message"`
+}
+
+func (e ResponseError) Error() string {
+	return fmt.Sprintf("Server returned status:%d message:'%s'", e.Status, e.Message)
+}
+
+func IsErrNotFound(err error) bool {
+	re, ok := err.(*ResponseError)
+	return ok && re.Status == http.StatusNotFound
+}
+
+func checkResponse(resp *http.Response) error {
+	c := resp.StatusCode
+	if c >= http.StatusOK && c <= 299 {
+		return nil
+	}
+	re := &ResponseError{Status: c}
+	err := json.NewDecoder(resp.Body).Decode(re)
+	if err != nil {
+		return err
+	}
+	return re
 }
 
 type Response struct {
