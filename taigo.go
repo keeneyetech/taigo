@@ -24,6 +24,8 @@ type Client struct {
 	UserStoryStatus *UserStoryStatusService
 	Issue           *IssueService
 	IssueStatus     *IssueStatusService
+	Task            *TaskService
+	TaskStatus      *TaskStatusService
 }
 
 func NewClient(URL, authToken string) *Client {
@@ -46,6 +48,8 @@ func NewClient(URL, authToken string) *Client {
 	c.UserStoryStatus = &UserStoryStatusService{c}
 	c.Issue = &IssueService{c}
 	c.IssueStatus = &IssueStatusService{c}
+	c.Task = &TaskService{c}
+	c.TaskStatus = &TaskStatusService{c}
 	return c
 }
 
