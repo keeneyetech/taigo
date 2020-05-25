@@ -58,9 +58,50 @@ func NewClient(URL, authToken string) *Client {
 // be used directly.
 // Relative URLs should always be specified without a preceding slash.
 func (c *Client) NewRequest(method, urlStr string, opt interface{}, body interface{}) (*http.Request, error) {
+
+	addLast := false
+	disablePagination := true
+
+	if opt != nil {
+		rv := reflect.ValueOf(opt)
+		if rv.Type().Kind() != reflect.Ptr {
+			// Create a new type of Iface's Type,
+			// so we have a pointer to work with
+			rv = reflect.New(reflect.TypeOf(opt))
+		}
+		f := rv.Elem().FieldByName("Page")
+		if f.IsValid() && !f.IsNil() {
+			// if we have some page parameter
+			// transform it for easier usage
+			p := f.Elem().Int()
+			if p != 0 {
+				// for convenience setting *page to 0 also
+				// disables pagination
+				disablePagination = false
+				if p == -1 {
+					addLast = true
+				}
+			}
+			if p <= 0 {
+				// we want to translate *page = -1 into "last"
+				// so we nil the parameter here to replace
+				// it later with the string "last" for page
+				var x *int
+				f.Set(reflect.ValueOf(x))
+			}
+		}
+	}
+
 	rel, err := addOptions(urlStr, opt)
 	if err != nil {
 		return nil, err
+	}
+
+	if addLast {
+		// we already removed page -1 and replace it now with "last"
+		q := rel.Query()
+		q.Set("page", "last")
+		rel.RawQuery = q.Encode()
 	}
 
 	u := c.URL.ResolveReference(rel)
@@ -76,6 +117,12 @@ func (c *Client) NewRequest(method, urlStr string, opt interface{}, body interfa
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
 		return nil, err
+	}
+
+	if disablePagination {
+		// we disable pagination if there is no "page"
+		// option for the request or the page was 0
+		req.Header.Add("x-disable-pagination", "true")
 	}
 
 	req.Header.Add("Authorization", "Bearer "+c.authToken)
