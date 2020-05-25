@@ -144,14 +144,14 @@ type Response struct {
 	Paginated bool
 	// PaginatedBy holds the number of results per page
 	PaginatedBy int
-	// PaginationCount holds total number of results
+	// PaginationCount holds total number of results (not pages)
 	PaginationCount int
-	// PaginationCurrent holds the current page
+	// PaginationCurrent holds the current page (starting at 1)
 	PaginationCurrent int
-	// PaginationNext holds the next results
-	PaginationNext int
-	// PaginationPrev holds the previous results
-	PaginationPrev int
+	// PaginationNext holds an URL for the next results
+	PaginationNext string
+	// PaginationPrev holds an URL for the previous results
+	PaginationPrev string
 }
 
 // newResponse creates a new Response for the provided http.Response.
@@ -164,10 +164,10 @@ func newResponse(r *http.Response) *Response {
 const (
 	xPaginated         = "x-paginated"
 	xPaginatedBy       = "x-paginated-by"
-	xPaginationCount   = "x-pagintation-count"
-	xPaginationCurrent = "x-pagintation-current"
-	xPaginationNext    = "x-pagintation-next"
-	xPaginationPrev    = "x-pagintation-prev"
+	xPaginationCount   = "x-pagination-count"
+	xPaginationCurrent = "x-pagination-current"
+	xPaginationNext    = "x-pagination-next"
+	xPaginationPrev    = "x-pagination-prev"
 )
 
 // populatePageValues parses the HTTP Link response headers and populates the
@@ -177,8 +177,8 @@ func (r *Response) populatePageValues() {
 	r.PaginatedBy, _ = strconv.Atoi(r.Header.Get(xPaginatedBy))
 	r.PaginationCount, _ = strconv.Atoi(r.Header.Get(xPaginationCount))
 	r.PaginationCurrent, _ = strconv.Atoi(r.Header.Get(xPaginationCurrent))
-	r.PaginationNext, _ = strconv.Atoi(r.Header.Get(xPaginationNext))
-	r.PaginationPrev, _ = strconv.Atoi(r.Header.Get(xPaginationPrev))
+	r.PaginationNext = r.Header.Get(xPaginationNext)
+	r.PaginationPrev = r.Header.Get(xPaginationPrev)
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s.  opt
